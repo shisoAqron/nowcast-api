@@ -4,7 +4,7 @@ const nowCast = require('./now-cast');
 const app = express()
 
 app.get("/:diff/:lng/:lat", (req, res) => {
-    console.log(req.params);
+    console.log(req.params)
 
     nowCast.getPrecipitation(req.params.diff, req.params.lng, req.params.lat)
     .then( data =>  {

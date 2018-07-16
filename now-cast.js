@@ -71,11 +71,18 @@ const getTimeStamps = (diff = 0) => {
  * @param {Number} lat 
  */
 const getPrecipitation = async (diff, lng, lat) =>{
+    let result = {}
+
     let i = Math.floor(map(lng, 100, 170, 0, 64))
     let j = Math.floor(map(lat, 7, 61, 64, 0))
 
     let x = Math.floor(map(lng, 100, 170, 0, mapLength) - (i * tileLength))
     let y = Math.floor(map(lat, 7, 61, mapLength, 0) - (j * tileLength))
+
+    if(diff < -60 || diff > 60 || isNaN(diff)){
+        result.error = "時間指定が間違っています"
+        return result
+    }
 
     let ts = getTimeStamps(diff)
     let url = "https://www.jma.go.jp/jp/highresorad/highresorad_tile/HRKSNC/" + ts[0] + "/" + ts[1] + "/zoom6/" + i + "_" + j + ".png"
@@ -84,7 +91,7 @@ const getPrecipitation = async (diff, lng, lat) =>{
     const image = await Jimp.read(url)
     let hexColor = image.getPixelColor(x, y)
     let rgbColor = Jimp.intToRGBA(hexColor);
-    let result = {'min':"null"};
+    
 
     for (let color of colors) {
         if (rgbColor.r == color.r && rgbColor.g == color.g && rgbColor.b == color.b) {
@@ -92,6 +99,8 @@ const getPrecipitation = async (diff, lng, lat) =>{
             result.max = color.max
             break
         }
+        result.min = "null"
+        result.max = "null"
     }
 
     result.r = rgbColor.r
